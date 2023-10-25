@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const cors = require('cors');
 require('dotenv').config()
@@ -27,12 +27,32 @@ async function run() {
 
 
         const serviceCollection = client.db('carDoctor').collection('services');
+        const bookingsCollection = client.db('carDoctor').collection('bookings');
 
 
         app.get('/services',async(req,res)=>{
             const cursor = serviceCollection.find();
             const result = await cursor.toArray();
             res.send(result);
+        })
+
+        app.get('/services/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const options = {
+                projection: {title: 1, price: 1}
+            }
+            const result = await serviceCollection.findOne(query,options);
+            res.send(result);
+        })
+        
+        //Booking collectin...
+        app.post('/bookings',async(req,res)=>{
+            const bookingData = req.body;
+            console.log(bookingData)
+            const result = await bookingsCollection.insertOne(bookingData);
+            res.send(result);
+            
         })
 
         // Send a ping to confirm a successful connection
