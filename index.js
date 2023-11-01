@@ -59,10 +59,16 @@ async function run() {
             res
             .cookie('token',token,{
                 httpOnly: true,
-                secure: false
+                secure: true,
+                sameSite: "none"
             })
             .send({success: true})
 
+        }) 
+
+        app.post('/logout',async(req,res)=>{
+            const user = req.body;
+            res.clearCookie('token', {maxAge: 0}).send({success: true})
         })
 
 
