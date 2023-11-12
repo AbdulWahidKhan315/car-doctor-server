@@ -8,7 +8,7 @@ require('dotenv').config()
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173','http://localhost/5000'],
     credentials: true
 }));
 app.use(express.json());
@@ -74,7 +74,17 @@ async function run() {
 
         //booking related api
         app.get('/services',async(req,res)=>{
-            const cursor = serviceCollection.find();
+            const filter = req.query
+            console.log(filter.search);
+            const query = {
+                title: {$regex: filter.search, $options: 'i'}
+            }
+            const options = {
+                sort:{
+                    price: filter.sort === 'asc' ? 1 : -1
+                }
+            }
+            const cursor = serviceCollection.find(query,options);
             const result = await cursor.toArray();
             res.send(result);
         })
